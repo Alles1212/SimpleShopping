@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <!--bootstrap-->
+    
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Shop Homepage - Start Bootstrap Template</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='../assets/favicon.ico') }}" />
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="../static/css/styles.css" rel="stylesheet" />
+        <!--jQuery-->
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <!--index.js-->
+        <script src="../static/js/index.js"></script>
+    </head>
+    <body>
+        <h1>新增商品</h1>
+        {% for product in products %}
+        <form id="myForm">
+            <input type="hidden" name="id" id="id" value="{{ product['id'] }}">
+            <label  for="name">輸入商品名稱：</label>
+            <div class="col-2">
+                <input class="form-control" value="{{product['name']}}" type="text" id="name" name="name" required/>
+            </div>
+
+            <label  for="price">輸入商品價格：</label>
+            <div class="col-2">
+                <input class="form-control" value="{{product['price']}}" type="number" id="price" name="price" required/>
+            </div>
+            <label  for="stock">輸入商品數量：</label>
+            <div class="col-2">
+                <input class="form-control"  value="{{product['stock']}}" type="number" id="stock" name="stock" required/>
+            </div>
+            <input type='button' onClick="editForm()" value="修改">
+        </form>
+        {% endfor %}
+    </body>
+</html>
