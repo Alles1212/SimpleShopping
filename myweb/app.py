@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, jsonify, flash, session, redirect, url_for
-from flask_mysqldb import MySQL
-# from flaskext.mysql import MySQL
-# from flask_mysql_connector import MySQL
+from flask_mysqldb import MySQL#default為MySQLdb pip install wheel, pip install mysqlclient
 from application import create_app
+
 
 app = create_app()
 app.config["SECRET_KEY"] = '57e3b0516c0bbf2a20b555579980b875'#secrets.token_hex(16)
@@ -11,25 +10,36 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'test'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+
+# Flask                    2.3.2(改到3.0.0 solved)
 
 mysql = MySQL(app)
-# mysql.init_app(app)
-# mysql.init_app(app)
 
-if mysql.connection:
-    print("connected") 
-else:
-    print("retry")
-    print(mysql.connection)
+# Check MySQL connection
+with app.app_context():
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT 1')
+    result = cursor.fetchone()
 
+    if result:
+        print('Connected to MySQL')
+    else:
+        print('Failed to connect to MySQL')
+
+    # Close the cursor
+    cursor.close()
+
+#pos 商家:1 使用者:0
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         name = request.form['name']
         password = request.form['password']
+        pos = request.form['pos']
 
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO users (name, password) VALUES (%s, %s)",(name, password))
+        cur.execute("INSERT INTO users (name, password, pos) VALUES (%s, %s, %s)",(name, password, pos))
         mysql.connection.commit()
 
         cur.close()
@@ -51,8 +61,13 @@ def login():
 
         if user:
             session['user_id'] = user['id']
-            flash('Login successful.', 'success')
-            return redirect(url_for('Home'))
+            session['user_name'] = user['name']
+            if user['pos'] == 0:# 0:客戶
+                flash('customerUser Login successful.', 'success')            
+                return render_template('index.html')
+            else:# 1:商家
+                flash('shopUser Login successful.', 'success')
+                return render_template('index.html') 
         else:
             flash('Login failed. Please check your username and password.', 'danger')
 
@@ -81,29 +96,14 @@ def list():
 def index():
     # product data
     cur = mysql.connection.cursor()
-    try:
-        cur.execute("SELECT * from product")
-        # Get column names to use as keys in the dictionaries
-        columns = [column[0] for column in cur.description]
+    cur.execute("SELECT * from product")
+    # Get column names to use as keys in the dictionaries
+    columns = [column[0] for column in cur.description]
 
-        # Fetch all rows as a list of dictionaries
-        products = [dict(zip(columns, row)) for row in cur.fetchall()]
-        return render_template('index.html', products=products)
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)})
-    finally:
-        # Close the cursor
-        cur.close()
-
-# @app.route('/add_cart/<int: id>')#test
-# def add_cart(id):
-#     cart = []
-#     if mysql.connection:
-#         cur = mysql.connection.cursor()
-#         try:
-#             cur.execute("SELECT * from product WHERE id = %s", (id,))
-
-
+    # Fetch all rows as a list of dictionaries
+    products = [dict(zip(columns, row)) for row in cur.fetchall()]
+    cur.close()
+    return render_template('index.html', products = products)
 
 @app.route('/insert', methods=['POST'])
 def insert():
@@ -112,35 +112,34 @@ def insert():
         price = request.form['price']
         stock = request.form['stock']
 
-        # Check if MySQL connection is successful
-        if mysql.connection:
-            # Create MySQL cursor
-            cur = mysql.connection.cursor()
-            print("cur exists")
+        # Create MySQL cursor
+        cur = mysql.connection.cursor()
 
-            try:
-                # Insert data into the database
-                cur.execute("INSERT INTO product (name, price, stock) VALUES (%s, %s, %s)", (name, price, stock))
+        try:
+            # Insert data into the database
+            cur.execute("INSERT INTO product (name, price, stock) VALUES (%s, %s, %s)", (name, price, stock))
 
-                # Commit changes and close the cursor
-                mysql.connection.commit()
+            # Commit changes and close the cursor
+            mysql.connection.commit()
 
-                # Return a JSON response
-                return jsonify({'success': True, 'message': 'Data inserted successfully'})
-            except Exception as e:
-                # Rollback changes in case of an error
-                mysql.connection.rollback()
-                # Return a JSON response in case of an error
-                return jsonify({'success': False, 'message': str(e)})
-            finally:
-                # Close the cursor
-                cur.close()
-        else:
-            return jsonify({'success': False, 'message': 'MySQL connection failed'})
+            # Return a JSON response
+            return jsonify({'success': True, 'message': 'Data inserted successfully'})
+
+        except Exception as e:
+            # Rollback changes in case of an error
+            mysql.connection.rollback()
+
+            # Return a JSON response in case of an error
+            return jsonify({'success': False, 'message': str(e)})
+
+        finally:
+            # Close the cursor
+            cur.close()
 
     return render_template('index.html')
 @app.route('/delete_product/<int:id>')
 def delete_product(id):
+
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM product WHERE id = %s", (id,))
     mysql.connection.commit()
@@ -149,10 +148,10 @@ def delete_product(id):
     return index()
 @app.route('/change_product/<int:id>')
 def change_product(id):
-    # product data
+   # product data
     cur = mysql.connection.cursor()
     cur.execute("SELECT * from product WHERE id = %s", (id,))
-    # Get column names to use as keys in the dictionaries
+     # Get column names to use as keys in the dictionaries
     columns = [column[0] for column in cur.description]
 
     # Fetch all rows as a list of dictionaries

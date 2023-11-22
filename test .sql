@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-11-20 20:19:26
+-- 產生時間： 2023-11-22 15:47:40
 -- 伺服器版本： 10.4.28-MariaDB
 -- PHP 版本： 8.2.4
 
@@ -44,8 +44,8 @@ CREATE TABLE `cart` (
 CREATE TABLE `product` (
   `id` int(11) NOT NULL,
   `name` varchar(15) NOT NULL,
-  `price` int(5) NOT NULL,
-  `stock` int(5) NOT NULL
+  `price` int(11) NOT NULL,
+  `stock` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -79,8 +79,17 @@ CREATE TABLE `shop_cart` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `name` text NOT NULL,
-  `password` text NOT NULL
+  `password` text NOT NULL,
+  `pos` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- 傾印資料表的資料 `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `password`, `pos`) VALUES
+(0, 'Alles', '1212', 0),
+(0, 'shop', '1', 1);
 
 --
 -- 已傾印資料表的索引
@@ -106,7 +115,7 @@ ALTER TABLE `shop_cart`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `shop_cart`
