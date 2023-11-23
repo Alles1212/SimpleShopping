@@ -51,7 +51,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#!">All Products</a></li>
+                                <li><a class="dropdown-item" href="/shop">All Products SHOP</a></li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                                 <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
@@ -61,18 +61,20 @@
 
                     {% if 'user_name' in session %}
                         <li class="nav-item navbar-right">
-                            <button class="nav-link" href="/logout">目前使用者:{{ session['user_name'] }}登出</button>
+                            <a class="nav-link" href="/logout">目前使用者:{{ session['user_name'] }}登出</a>
                         </li>
                     {% else %}
                     {% endif %}
 
+                    
                     <form class="d-flex">
-                        <button class="btn btn-outline-dark" type="submit">
+                        <a class="btn btn-outline-dark" href="{{ url_for('cartlist') }}">
                             <i class="bi-cart-fill me-1"></i>
                             Cart
                             <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                        </button>
+                        </a>
                     </form>
+                    <a href="{{ url_for('login_regi') }}">註冊登入</a>
                 </div>
             </div>
         </nav>
@@ -112,9 +114,11 @@
                             </div>
                             <!-- Product actions-->
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                            
-                                <a class="btn btn-outline-dark mt-auto" href="{{ url_for('change_product', id = product['id']) }}">修改</a>
-                                <a class="btn btn-outline-dark mt-auto" href="{{ url_for('delete_product', id = product['id']) }}">刪除</a>
+
+                                <a class="btn btn-outline-dark mt-auto" href="{{ url_for('change_product', id = product['id']|int) }}">修改</a>
+                                <a class="btn btn-outline-dark mt-auto" href="{{ url_for('delete_product', id = product['id']|int) }}">刪除</a>
+                                <a class="btn btn-outline-dark mt-auto" href="{{ url_for('add_cart', id = product['id']|int) }}">Add to cart</a>
+
                             </div>
                         </div>
                     </div>

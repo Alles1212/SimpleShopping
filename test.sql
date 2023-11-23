@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-11-22 15:47:40
+-- 產生時間： 2023-11-23 06:05:52
 -- 伺服器版本： 10.4.28-MariaDB
 -- PHP 版本： 8.2.4
 
@@ -24,16 +24,24 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- 資料表結構 `cart`
+-- 資料表結構 `customer_cart`
 --
 
-CREATE TABLE `cart` (
+CREATE TABLE `customer_cart` (
   `id` int(11) NOT NULL,
   `product` text NOT NULL,
   `price` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   `sumPrice` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- 傾印資料表的資料 `customer_cart`
+--
+
+INSERT INTO `customer_cart` (`id`, `product`, `price`, `amount`, `sumPrice`) VALUES
+(4, 'banana', 10, 10, 100),
+(8, 'Watermelon', 71, 12, 852);
 
 -- --------------------------------------------------------
 
@@ -53,8 +61,9 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`id`, `name`, `price`, `stock`) VALUES
-(116, '洗澡', 1, 1),
-(117, 'ss', 11, 11);
+(1, 'banana', 10, 10),
+(2, 'apple', 50, 6),
+(3, 'Watermelon', 71, 12);
 
 -- --------------------------------------------------------
 
@@ -96,6 +105,12 @@ INSERT INTO `users` (`id`, `name`, `password`, `pos`) VALUES
 --
 
 --
+-- 資料表索引 `customer_cart`
+--
+ALTER TABLE `customer_cart`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- 資料表索引 `product`
 --
 ALTER TABLE `product`
@@ -112,10 +127,16 @@ ALTER TABLE `shop_cart`
 --
 
 --
+-- 使用資料表自動遞增(AUTO_INCREMENT) `customer_cart`
+--
+ALTER TABLE `customer_cart`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `shop_cart`

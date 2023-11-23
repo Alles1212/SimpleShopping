@@ -10,4 +10,5 @@ def create_app():
     app.add_url_rule('/', '/', Home)#首頁
     app.add_url_rule('/login_regi', 'login_regi', login_regi)#註冊登入login&register
     app.add_url_rule('/add_shop', 'add_shop', add_shop)
+
     return app

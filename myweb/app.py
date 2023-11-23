@@ -81,27 +81,79 @@ def logout():
     flash('You have been logged out.', 'success')
     return redirect(url_for('login_regi'))
 
-@app.route('/cartList')#test 還沒寫
-def list():
+@app.route('/cartList')#列出購物車
+def cartlist():
     cur = mysql.connection.cursor()
 
-    cartItem = cur.execute("SELECT * FROM cart")
+    cartItem = cur.execute("SELECT * FROM customer_cart")
+
+    # columns = [column[0] for column in cur.description]
 
     if cartItem > 0:
+        print("items")
+        
         cartLists = cur.fetchall()
+        # cartLists_dict = [dict(zip(columns, row)) for row in cartLists]
+        items_num = len(cartLists)
 
-        return render_template('cart.html', cartLists = cartLists)
+        cur.close()
+        return render_template('cart.html', cartLists = cartLists, items_num = items_num)
+    
+    else:
+        print("no item")
+        items_num = 0
+
+        cur.close()
+        return render_template('cart.html', cartLists = cartLists, items_num = items_num)
+    
+    
+@app.route('/add_cart/<int:id>')
+def add_cart(id):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM product WHERE id = %s", (id,))
+
+    item_add = cur.fetchone()
+    if item_add:
+        product = item_add['name']
+        price = item_add['price']
+        amount = item_add['stock']
+        sumPrice = price * amount
+        
+        cur.execute("INSERT INTO customer_cart (product, price, amount, sumPrice) VALUES (%s, %s, %s, %s)",(product, price, amount, sumPrice))
+        mysql.connection.commit()
+        cur.close()
+        flash('成功加入購物車', 'success')
+        return redirect(url_for('cartlist'))
+    else:
+        cur.close()
+        flash('產品不存在', 'danger')
+        return redirect(url_for('cartlist'))
+    
+@app.route('/del_cart/<int:id>')
+def del_cart(id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM customer_cart WHERE id = %s", (id,))
+    mysql.connection.commit()
+    cur.close()
+    flash('已移出購物車', 'danger')
+    return index()
+
+
+
 
 @app.route('/shop')
 def index():
     # product data
     cur = mysql.connection.cursor()
     cur.execute("SELECT * from product")
+
+
     # Get column names to use as keys in the dictionaries
-    columns = [column[0] for column in cur.description]
+    # columns = [column[0] for column in cur.description]
 
     # Fetch all rows as a list of dictionaries
-    products = [dict(zip(columns, row)) for row in cur.fetchall()]
+    products = cur.fetchall() #更動
+    # products = [dict(zip(columns, row)) for row in cur.fetchall()]
     cur.close()
     return render_template('index.html', products = products)
 
