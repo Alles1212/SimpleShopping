@@ -5,3 +5,6 @@ def hello_world():
 
 def Home():
     return render_template("index.html") 
+def add_shop():
+    return render_template("add_shop.html")
+
