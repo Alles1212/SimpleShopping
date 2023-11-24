@@ -64,10 +64,10 @@ def login():
             session['user_name'] = user['name']
             if user['pos'] == 0:# 0:客戶
                 flash('customerUser Login successful.', 'success')            
-                return render_template('index.html')
+                return render_template('browse_client.html')
             else:# 1:商家
                 flash('shopUser Login successful.', 'success')
-                return render_template('index.html') 
+                return render_template('browse.html') 
         else:
             flash('Login failed. Please check your username and password.', 'danger')
 
@@ -108,7 +108,7 @@ def cartlist():
     
     
 @app.route('/add_cart/<int:id>')
-def add_cart(id):
+def add_cart(id,amount):
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM product WHERE id = %s", (id,))
 
@@ -116,7 +116,10 @@ def add_cart(id):
     if item_add:
         product = item_add['name']
         price = item_add['price']
-        amount = item_add['stock']
+        if (amount>item_add['stock']):
+             flash('產品庫存不足', 'danger')
+        else:
+            amount=amount
         sumPrice = price * amount
         
         cur.execute("INSERT INTO customer_cart (product, price, amount, sumPrice) VALUES (%s, %s, %s, %s)",(product, price, amount, sumPrice))
@@ -155,7 +158,7 @@ def index():
     products = cur.fetchall() #更動
     # products = [dict(zip(columns, row)) for row in cur.fetchall()]
     cur.close()
-    return render_template('index.html', products = products)
+    return render_template('browse.html', products = products)
 
 @app.route('/insert', methods=['POST'])
 def insert():
@@ -243,6 +246,5 @@ def update():
             cur.close()
 
     return index()
-
 if __name__ == "__main__":
     app.run(debug=True, port=8000)
