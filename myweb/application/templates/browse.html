@@ -21,6 +21,24 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.12.5/dist/sweetalert2.all.min.js"></script>
     </head>
     <body>
+        <h1>新增商品</h1>
+        <form id="myForm">
+            <label  for="name">輸入商品名稱：</label>
+            <div class="col-2">
+                    <input class="form-control" type="text" id="name" name="name" required/>
+            </div>
+
+            <label  for="price">輸入商品價格：</label>
+            <div class="col-2">
+                    <input class="form-control" type="number" id="price" name="price" required/>
+            </div>
+            <label  for="stock">輸入商品數量：</label>
+            <div class="col-2">
+                    <input class="form-control" type="number" id="stock" name="stock" required/>
+            </div>
+            <input type='button' onClick="postForm()" value="save">
+        </form>      
+        <a href="{{ url_for('home')}}">回到首頁</a>
         <!-- Section-->
         <section class="py-5">
             <div class="container px-4 px-lg-5 mt-5">

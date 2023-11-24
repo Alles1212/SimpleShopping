@@ -30,6 +30,14 @@ with app.app_context():
     # Close the cursor
     cursor.close()
 
+@app.route('/')
+def home():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * from product")
+    products = cur.fetchall()
+    cur.close()
+    return render_template("index.html", products = products)
+
 #pos 商家:1 使用者:0
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -59,15 +67,19 @@ def login():
         cur.execute("SELECT * FROM users WHERE name = %s AND password = %s", (name, password))
         user = cur.fetchone()
 
+        cur.execute("SELECT * FROM product")
+        products = cur.fetchall()
+
         if user:
             session['user_id'] = user['id']
             session['user_name'] = user['name']
+            session['user_pos'] = user['pos']
             if user['pos'] == 0:# 0:客戶
                 flash('customerUser Login successful.', 'success')            
-                return render_template('browse_client.html')
+                return render_template('browse_client.html', products = products)
             else:# 1:商家
                 flash('shopUser Login successful.', 'success')
-                return render_template('browse.html') 
+                return render_template('browse.html', products = products) 
         else:
             flash('Login failed. Please check your username and password.', 'danger')
 
@@ -107,17 +119,19 @@ def cartlist():
         return render_template('cart.html', cartLists = cartLists, items_num = items_num)
     
     
-@app.route('/add_cart/<int:id>')
-def add_cart(id,amount):
+@app.route('/add_cart/<int:id>', methods=['POST'])
+def add_cart(id):
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM product WHERE id = %s", (id,))
-
+    amount_str = request.form.get('amount')
+    amount = int(amount_str)
     item_add = cur.fetchone()
     if item_add:
         product = item_add['name']
         price = item_add['price']
-        if (amount>item_add['stock']):
-             flash('產品庫存不足', 'danger')
+        if (amount>=item_add['stock']):
+            flash('產品庫存不足', 'danger')
+            return redirect(url_for('cartlist'))
         else:
             amount=amount
         sumPrice = price * amount
@@ -139,7 +153,7 @@ def del_cart(id):
     mysql.connection.commit()
     cur.close()
     flash('已移出購物車', 'danger')
-    return index()
+    return redirect(url_for('cartlist'))
 
 
 
