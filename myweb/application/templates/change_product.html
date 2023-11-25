@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Shop Homepage - Start Bootstrap Template</title>
+        <title>商家修改產品</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='../assets/favicon.ico') }}" />
         <!-- Bootstrap icons-->
@@ -27,7 +27,10 @@
             <div class="col-2">
                 <input class="form-control" value="{{product['name']}}" type="text" id="name" name="name" required/>
             </div>
-
+            <label for="description">輸入商品敘述：</label>
+            <div class="col-2">
+                <input class="form-control" value="{{product['description']}}" type="text" id="description" name="description" required/>
+            </div>
             <label  for="price">輸入商品價格：</label>
             <div class="col-2">
                 <input class="form-control" value="{{product['price']}}" type="number" id="price" name="price" required/>

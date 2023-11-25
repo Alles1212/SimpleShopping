@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Shop Homepage - Start Bootstrap Template</title>
+        <title>客戶購物網站</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='../assets/favicon.ico') }}" />
         <!-- Bootstrap icons-->
@@ -24,6 +24,7 @@
         <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
             <a class="btn btn-outline-dark mt-auto" href="{{ url_for('cartlist') }}"> browse cart</a>
         </div>
+        <a href="{{ url_for('home')}}">回到首頁</a>
         <!-- Section-->
         <section class="py-5">
             <div class="container px-4 px-lg-5 mt-5">
@@ -42,16 +43,18 @@
                                 <div class="text-center">
                                     <!-- Product name-->
                                     <h5 class="fw-bolder">{{ product['name'] }}</h5>
+                                    <!-- Product description -->
+                                    商品敘述:{{ product['description'] }}<br>
                                     <!-- Product price-->
                                     ${{ product['price'] }}<br>
                                     <!-- Product amount-->
-                                    庫存:{{ product['stock']}}
+                                    庫存:{{ product['stock'] }}
                                 </div>
                             </div>
                             <!-- Product actions-->
                             <!-- href="{{ url_for('add_cart', id = product['id']|int)}}" -->
                             <form action="{{ url_for('add_cart', id = product['id']|int) }}", method="POST">
-                                <input class="text-center" type="number" max="{{ product['stock'] }}" id="amount" name="amount" required/>
+                                欲購入數量:<input class="text-center" type="number" max="{{ product['stock'] }}" id="amount" name="amount" required/>
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                                 <button type="submit" class="btn btn-outline-dark mt-auto">Add to cart</button>
                             </div>
@@ -68,5 +71,28 @@
                 </div>
             </div>
         </section>
+        <main class="container-fluid">
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-8">
+                    {% with messages = get_flashed_messages(with_categories = true)%}
+                        {% if messages %}
+                            {% for category, message in messages%}
+                                <script>
+                                    // 美化訊息框, msg
+                                    Swal.fire({//以js綁定
+                                        title: "{{ category.title() }}",
+                                        text: "{{ message }}",
+                                        icon: "{{ category }}",
+                                        closeOnConfirm: false
+                                    })
+                                </script>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="col-md-2"></div>
+            </div>
+        </main>
     </body>
 </html>

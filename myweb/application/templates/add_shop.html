@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Shop Homepage - Start Bootstrap Template</title>
+        <title>加入購物車</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='../assets/favicon.ico') }}" />
         <!-- Bootstrap icons-->
@@ -17,7 +17,7 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="#!">Start Bootstrap</a>
+                <a class="navbar-brand" href="#!">軟工購物網站</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
@@ -45,12 +45,16 @@
         </nav>
         <!-- Header-->
         <h1>新增商品</h1>
+        <h1>新增商品</h1>
         <form>
             <label class="col-2 col-form-label text-end" for="name">輸入商品名稱：</label>
             <div class="col-2">
                     <input class="form-control" type="text" id="name" name="name" required/>
             </div>
-
+            <label class="col-2 col-form-label text-end" for="name">輸入商品敘述：</label>
+            <div class="col-2">
+                    <input class="form-control" type="text" id="description" name="description" required/>
+            </div>
             <label class="col-2 col-form-label text-end" for="price">輸入商品價格：</label>
             <div class="col-2">
                     <input class="form-control" type="number" id="price" name="price" required/>

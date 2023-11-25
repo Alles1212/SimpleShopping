@@ -38,7 +38,7 @@ def home():
     cur.close()
     return render_template("index.html", products = products)
 
-#pos 商家:1 使用者:0
+#pos 物流:2 商家:1 使用者:0 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -69,17 +69,23 @@ def login():
 
         cur.execute("SELECT * FROM product")
         products = cur.fetchall()
-
+        pos ={0:'客戶',1:'商家',2:'物流'}
         if user:
             session['user_id'] = user['id']
+            print(user['id'])
+            print (type(session['user_id']))
             session['user_name'] = user['name']
-            session['user_pos'] = user['pos']
+            session['user_pos'] = pos[user['pos']]
+
             if user['pos'] == 0:# 0:客戶
                 flash('customerUser Login successful.', 'success')            
                 return render_template('browse_client.html', products = products)
-            else:# 1:商家
+            elif user['pos'] == 1:# 1:商家
                 flash('shopUser Login successful.', 'success')
                 return render_template('browse.html', products = products) 
+            else:# 2:物流
+                flash('shipUser Login successful.', 'success')
+                return render_template('index.html') 
         else:
             flash('Login failed. Please check your username and password.', 'danger')
 
@@ -96,16 +102,12 @@ def logout():
 @app.route('/cartList')#列出購物車
 def cartlist():
     cur = mysql.connection.cursor()
-
-    cartItem = cur.execute("SELECT * FROM customer_cart")
-
-    # columns = [column[0] for column in cur.description]
-
+    cartItem = cur.execute("SELECT * FROM customer_cart WHERE user_id = %s", (session['user_id'],))#對應到各自購物車
+    # cartItem_personal = cur.fetchone()
     if cartItem > 0:
-        print("items")
-        
+        # if session['user_id'] == cartItem['user_id']:    
+        print("items")        
         cartLists = cur.fetchall()
-        # cartLists_dict = [dict(zip(columns, row)) for row in cartLists]
         items_num = len(cartLists)
 
         cur.close()
@@ -116,7 +118,7 @@ def cartlist():
         items_num = 0
 
         cur.close()
-        return render_template('cart.html', cartLists = cartLists, items_num = items_num)
+        return render_template('cart.html', cartLists = [], items_num = items_num)
     
     
 @app.route('/add_cart/<int:id>', methods=['POST'])
@@ -129,6 +131,10 @@ def add_cart(id):
     if item_add:
         product = item_add['name']
         price = item_add['price']
+        description = item_add['description']
+        shop_id = item_add['shop_id']
+        user_id = session['user_id']
+
         if (amount>=item_add['stock']):
             flash('產品庫存不足', 'danger')
             return redirect(url_for('cartlist'))
@@ -136,7 +142,7 @@ def add_cart(id):
             amount=amount
         sumPrice = price * amount
         
-        cur.execute("INSERT INTO customer_cart (product, price, amount, sumPrice) VALUES (%s, %s, %s, %s)",(product, price, amount, sumPrice))
+        cur.execute("INSERT INTO customer_cart (product, price, amount, sumPrice, description, user_id, shop_id) VALUES (%s, %s, %s, %s, %s, %s, %s)",(product, price, amount, sumPrice, description, user_id, shop_id))
         mysql.connection.commit()
         cur.close()
         flash('成功加入購物車', 'success')
@@ -155,9 +161,29 @@ def del_cart(id):
     flash('已移出購物車', 'danger')
     return redirect(url_for('cartlist'))
 
+@app.route('/reduce_cartNum/<int:id>', methods=['POST'])
+def reduce(id):
+    cur = mysql.connection.cursor()
+    reduce_amount = request.form.get('amount')
+    cur.execute("SELECT amount FROM customer_cart WHERE id = %s", (id,))
+    result = cur.fetchone()
+    print(result['amount'])
+    # if result:
+    #     origin = result[3]
+    # print(origin)
+    reduce_amount = int(reduce_amount)
+    print(reduce_amount)
+    if (reduce_amount > result['amount']):
+        flash('不能刪減多於原數量', 'danger')
+    else:
+        cur.execute("UPDATE customer_cart SET amount=%s WHERE id=%s ", (result['amount'] - reduce_amount, id))
+        mysql.connection.commit()#才會commit
+        cur.close()
+        flash('商品數量已減少', 'success')
+    return redirect(url_for('cartlist'))
 
 
-
+# #商家頁面
 @app.route('/shop')
 def index():
     # product data
@@ -180,13 +206,13 @@ def insert():
         name = request.form['name']
         price = request.form['price']
         stock = request.form['stock']
-
+        description = request.form['description']
         # Create MySQL cursor
         cur = mysql.connection.cursor()
 
         try:
             # Insert data into the database
-            cur.execute("INSERT INTO product (name, price, stock) VALUES (%s, %s, %s)", (name, price, stock))
+            cur.execute("INSERT INTO product (name, price, stock,description) VALUES (%s, %s, %s,%s)", (name, price, stock,description))
 
             # Commit changes and close the cursor
             mysql.connection.commit()
@@ -206,6 +232,7 @@ def insert():
             cur.close()
 
     return render_template('index.html')
+
 @app.route('/delete_product/<int:id>')
 def delete_product(id):
 
@@ -217,16 +244,14 @@ def delete_product(id):
     return index()
 @app.route('/change_product/<int:id>')
 def change_product(id):
-   # product data
     cur = mysql.connection.cursor()
     cur.execute("SELECT * from product WHERE id = %s", (id,))
-     # Get column names to use as keys in the dictionaries
-    columns = [column[0] for column in cur.description]
-
     # Fetch all rows as a list of dictionaries
-    products = [dict(zip(columns, row)) for row in cur.fetchall()]
-    cur.close()
+    products = cur.fetchall() #更動
+    # products = [dict(zip(columns, row)) for row in cur.fetchall()]
+    cur.close()   
     return render_template('change_product.html', products=products)
+
 @app.route('/update', methods=['POST'])
 def update():
     if request.method == 'POST':
@@ -234,13 +259,14 @@ def update():
         price = request.form['price']
         stock = request.form['stock']
         id = request.form['id']
+        description = request.form['description']
 
         # Create MySQL cursor
         cur = mysql.connection.cursor()
 
         try:
             # Update data in the database
-            cur.execute("UPDATE product SET name=%s, price=%s, stock=%s WHERE id=%s", (name, price, stock, id))
+            cur.execute("UPDATE product SET name=%s, price=%s, stock=%s,description=%s  WHERE id=%s", (name, price, stock, description, id ))
 
             # Commit changes and close the cursor
             mysql.connection.commit()
@@ -260,5 +286,7 @@ def update():
             cur.close()
 
     return index()
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

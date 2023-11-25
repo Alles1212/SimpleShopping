@@ -19,12 +19,43 @@
         <td>{{ cartItem['price'] }}</td>
         <td>{{ cartItem['amount'] }}</td>
         <td>{{ cartItem['sumPrice'] }}</td>
-        <td><a href="{{ url_for('del_cart', id = cartItem['id']|int) }}">刪除</a></td>
+        <td>
+        <form action="{{ url_for('reduce', id = cartItem['id']|int) }}", method="POST">
+            欲刪減數量:<input class="text-center" type="number" max="{{ cartItem['amount'] }}" id="amount" name="amount" required/>
+        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                <button type="submit" class="btn btn-outline-dark mt-auto">刪減</button>
+        </div>
+        </form>
+        </td>
+        <td><a href="{{ url_for('del_cart', id = cartItem['id']|int) }}">刪除商品</a></td>
     </tr>
     {% endfor %}
     </table>
     <p>購物車商品數量:{{ items_num }}</p>
     <a href="{{ url_for('home') }}">回到首頁</a>
+    <main class="container-fluid">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                {% with messages = get_flashed_messages(with_categories = true)%}
+                    {% if messages %}
+                        {% for category, message in messages%}
+                            <script>
+                                // 美化訊息框, msg
+                                Swal.fire({//以js綁定
+                                    title: "{{ category.title() }}",
+                                    text: "{{ message }}",
+                                    icon: "{{ category }}",
+                                    closeOnConfirm: false
+                                })
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </main>
 </body>
 </html>
 
