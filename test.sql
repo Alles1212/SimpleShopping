@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-11-25 20:05:42
+-- 產生時間： 2023-11-24 18:22:35
 -- 伺服器版本： 10.4.28-MariaDB
 -- PHP 版本： 8.2.4
 
@@ -42,25 +42,10 @@ CREATE TABLE `customer_cart` (
 -- 傾印資料表的資料 `customer_cart`
 --
 
-INSERT INTO `customer_cart` (`id`, `product`, `price`, `amount`, `sumPrice`, `description`, `user_id`, `shop_id`) VALUES
-(27, 'Grape', 20, 3, 60, '葡萄', 1, 0),
-(28, 'Pineapple', 50, 6, 300, '鳳梨辣', 1, 0),
-(29, 'apple', 50, 3, 150, '蘋果', 1, 0);
-
--- --------------------------------------------------------
-
---
--- 資料表結構 `order`
---
-
-CREATE TABLE `order` (
-  `order_id` int(11) NOT NULL,
-  `uId` int(11) NOT NULL,
-  `pId` int(11) NOT NULL,
-  `amount` int(11) NOT NULL,
-  `product_state` varchar(10) NOT NULL,
-  `review` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+INSERT INTO `customer_cart` (`id`, `product`, `price`, `amount`, `sumPrice`) VALUES
+(4, 'banana', 10, 10, 100),
+(8, 'Watermelon', 71, 12, 852),
+(9, 'apple', 50, 6, 300);
 
 -- --------------------------------------------------------
 
@@ -167,13 +152,7 @@ ALTER TABLE `users`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `customer_cart`
 --
 ALTER TABLE `customer_cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
-
---
--- 使用資料表自動遞增(AUTO_INCREMENT) `order`
---
-ALTER TABLE `order`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product`
