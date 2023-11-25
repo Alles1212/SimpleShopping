@@ -58,14 +58,18 @@ def login():
 
         cur.execute("SELECT * FROM users WHERE name = %s AND password = %s", (name, password))
         user = cur.fetchone()
-
+        pos ={0:'客戶',1:'商家',2:'物流'}
         if user:
             session['user_id'] = user['id']
             session['user_name'] = user['name']
+            session['pos'] = pos[user['pos']]
             if user['pos'] == 0:# 0:客戶
                 flash('customerUser Login successful.', 'success')            
                 return render_template('index.html')
-            else:# 1:商家
+            elif user['pos'] == 1:# 1:商家
+                flash('shopUser Login successful.', 'success')
+                return shop()
+            else:#物流
                 flash('shopUser Login successful.', 'success')
                 return render_template('index.html') 
         else:
@@ -163,13 +167,13 @@ def insert():
         name = request.form['name']
         price = request.form['price']
         stock = request.form['stock']
-
+        description = request.form['description']
         # Create MySQL cursor
         cur = mysql.connection.cursor()
 
         try:
             # Insert data into the database
-            cur.execute("INSERT INTO product (name, price, stock) VALUES (%s, %s, %s)", (name, price, stock))
+            cur.execute("INSERT INTO product (name, price, stock,description) VALUES (%s, %s, %s,%s)", (name, price, stock,description))
 
             # Commit changes and close the cursor
             mysql.connection.commit()
@@ -200,15 +204,17 @@ def delete_product(id):
     return index()
 @app.route('/change_product/<int:id>')
 def change_product(id):
-   # product data
+   
     cur = mysql.connection.cursor()
     cur.execute("SELECT * from product WHERE id = %s", (id,))
-     # Get column names to use as keys in the dictionaries
-    columns = [column[0] for column in cur.description]
+
+
 
     # Fetch all rows as a list of dictionaries
-    products = [dict(zip(columns, row)) for row in cur.fetchall()]
+    products = cur.fetchall() #更動
+    # products = [dict(zip(columns, row)) for row in cur.fetchall()]
     cur.close()
+    
     return render_template('change_product.html', products=products)
 @app.route('/update', methods=['POST'])
 def update():
@@ -217,13 +223,14 @@ def update():
         price = request.form['price']
         stock = request.form['stock']
         id = request.form['id']
+        description = request.form['description']
 
         # Create MySQL cursor
         cur = mysql.connection.cursor()
 
         try:
             # Update data in the database
-            cur.execute("UPDATE product SET name=%s, price=%s, stock=%s WHERE id=%s", (name, price, stock, id))
+            cur.execute("UPDATE product SET name=%s, price=%s, stock=%s,description=%s  WHERE id=%s", (name, price, stock,description, id ))
 
             # Commit changes and close the cursor
             mysql.connection.commit()
@@ -243,6 +250,22 @@ def update():
             cur.close()
 
     return index()
+#商家頁面
+@app.route('/add_shop')
+def shop():
+    # product data
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * from product")
+
+
+    # Get column names to use as keys in the dictionaries
+    # columns = [column[0] for column in cur.description]
+
+    # Fetch all rows as a list of dictionaries
+    products = cur.fetchall() #更動
+    # products = [dict(zip(columns, row)) for row in cur.fetchall()]
+    cur.close()
+    return render_template('index.html', products = products)
 
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

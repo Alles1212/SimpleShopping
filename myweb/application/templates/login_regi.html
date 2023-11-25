@@ -18,7 +18,13 @@ integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLAS
             <input type="password" name="password" class="field" required>
 
             <label for="pos">Pos</label>
-            <input type="pos" name="pos" class="field" required>
+            <select id='pos' name='pos' class="field" required>
+                <option value='' selected>-請選擇-</option>
+                  <option value=0>客戶</option>
+                  <option value=1>商家</option>
+                  <option value=2>物流</option>
+            </select>
+            
 
             <p class="error error--hidden"></p>
 

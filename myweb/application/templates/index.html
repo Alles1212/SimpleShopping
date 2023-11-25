@@ -27,7 +27,10 @@
             <div class="col-2">
                     <input class="form-control" type="text" id="name" name="name" required/>
             </div>
-
+            <label  for="description">輸入商品敘述：</label>
+            <div class="col-2">
+                <input class="form-control" type="text" id="description" name="description" required/>
+            </div>
             <label  for="price">輸入商品價格：</label>
             <div class="col-2">
                     <input class="form-control" type="number" id="price" name="price" required/>
@@ -61,7 +64,7 @@
 
                     {% if 'user_name' in session %}
                         <li class="nav-item navbar-right">
-                            <a class="nav-link" href="/logout">目前使用者:{{ session['user_name'] }}登出</a>
+                            <a class="nav-link" href="/logout">目前使用者:{{ session['user_name'] }}{{ session['pos'] }}登出</a>
                         </li>
                     {% else %}
                     {% endif %}
@@ -107,6 +110,9 @@
                                     <h5 class="fw-bolder">{{ product['name'] }}</h5>
                                     <!-- Product price-->
                                     ${{ product['price'] }}
+                                    <!--description-->
+                                    <br>
+                                    敘述:{{ product['description'] }}
                                     <!-- Product stock-->
                                     <br>
                                     庫存:{{ product['stock'] }}
