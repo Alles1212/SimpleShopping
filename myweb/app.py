@@ -307,22 +307,35 @@ def transport():
     # 渲染 HTML 模板并传递订单数据
     return render_template('transport.html', transports=transports)
 
-@app.route('/change_status/<order_id>',methods=['POST'])
-def change_status(order_id):
+@app.route('/change_status/<int:order_id>', methods=['POST'])
+def changeOrderstatus(order_id):
     cur = mysql.connection.cursor()
-    # 從資料庫中擷取該訂單的狀態
-    cursor.execute("SELECT `product_state` FROM `order` WHERE `order_id` = %s", (order_id,))
-    # 获取订单状态
-    order_status = cur.fetchone()
-    # 如果订单的状态已经是 'Shipped'
-    if order_status['product_state'] == 'Shipped':
-        # 如果出貨了就改成已經送達了
-        cur.execute("UPDATE `order` SET `product_state` = 'Delivered' WHERE `order_id` = %s", (order_id,))
-    else:
-        # 如果还没出货就改成已經出貨
-       cur.execute("UPDATE `order` SET `product_state` = 'Shipped' WHERE `order_id` = %s", (order_id,))
-    # 提交修改到数据库
-    mysql.connection.commit()
 
+    if request.method == 'POST':
+        # 从表单中获取状态值
+        new_status = request.form.get('new_status')
+
+        # 从数据库中提取当前状态
+        cur.execute("SELECT `product_state` FROM `order` WHERE `order_id` = %s", (order_id,))
+        current_status = cur.fetchone()
+
+        # 如果状态不为空
+        #state: 0==packing ,1==delivered ,2==shipping  ,3==finished
+        if current_status:
+            current_status = current_status[0]
+            if current_status == 0:
+                cur.execute("UPDATE `order` SET `product_state` = 1 WHERE `order_id` = %s", (order_id,))
+                return render_template('index.html')
+            elif current_status == 1:
+                cur.execute("UPDATE `order` SET `product_state` = 2 WHERE `order_id` = %s", (order_id,))
+                return render_template('transport.html')
+            elif current_status == 2:
+                cur.execute("UPDATE `order` SET `product_state` = 3 WHERE `order_id` = %s", (order_id,))
+                return render_template('order.html')
+
+            # 提交修改到数据库
+            mysql.connection.commit()
+
+    return "Status updated successfully"
 if __name__ == "__main__":
     app.run(debug=True, port=8000)
