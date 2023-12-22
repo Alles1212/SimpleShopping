@@ -69,6 +69,10 @@ def login():
 
         cur.execute("SELECT * FROM product")
         products = cur.fetchall()
+        #選擇所有訂單
+        cur.execute("SELECT * FROM product")
+        transport=cur.fetchall()
+
         pos ={0:'客戶',1:'商家',2:'物流'}
         if user:
             session['user_id'] = user['id']
@@ -85,7 +89,7 @@ def login():
                 return render_template('browse.html', products = products) 
             else:# 2:物流
                 flash('shipUser Login successful.', 'success')
-                return render_template('index.html') 
+                return render_template('transport.html', transport = transport ) 
         else:
             flash('Login failed. Please check your username and password.', 'danger')
 
@@ -291,7 +295,34 @@ def update():
             cur.close()
 
     return index()
+#列出所有的訂單
+@app.route('/transport', methods=['POST'])
+def transport():
+    cur = mysql.connection.cursor()
+    # 從資料庫中擷取所有狀態
+    cursor.execute("SELECT * FROM `order`")
+    transports= cursor.fetchall()
+    # 关闭数据库连接
+    cur.close()
+    # 渲染 HTML 模板并传递订单数据
+    return render_template('transport.html', transports=transports)
 
+@app.route('/change_status/<order_id>',methods=['POST'])
+def change_status(order_id):
+    cur = mysql.connection.cursor()
+    # 從資料庫中擷取該訂單的狀態
+    cursor.execute("SELECT `product_state` FROM `order` WHERE `order_id` = %s", (order_id,))
+    # 获取订单状态
+    order_status = cur.fetchone()
+    # 如果订单的状态已经是 'Shipped'
+    if order_status['product_state'] == 'Shipped':
+        # 如果出貨了就改成已經送達了
+        cur.execute("UPDATE `order` SET `product_state` = 'Delivered' WHERE `order_id` = %s", (order_id,))
+    else:
+        # 如果还没出货就改成已經出貨
+       cur.execute("UPDATE `order` SET `product_state` = 'Shipped' WHERE `order_id` = %s", (order_id,))
+    # 提交修改到数据库
+    mysql.connection.commit()
 
 if __name__ == "__main__":
     app.run(debug=True, port=8000)
