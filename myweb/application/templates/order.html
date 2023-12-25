@@ -8,30 +8,28 @@
 <body>
     <table border="2">
     <tr>
-        <th>Product</th>
-        <th>Price</th>
-        <th>Amount</th>
+        <th>uId</th>
+        <th>pId</th>
+        <th>product</th>
+        <th>amount</th>
         <th>sumPrice</th>
+        <th>product_state</th>
+        <th>review</th>
     </tr>
-    {% for cartItem in cartLists %}
+    {% for orderItem in order_products %}
     <tr>
-        <td>{{ cartItem['product'] }}</td>
-        <td>{{ cartItem['price'] }}</td>
-        <td>{{ cartItem['amount'] }}</td>
-        <td>{{ cartItem['sumPrice'] }}</td>
-        <td>
-        <form action="{{ url_for('reduce', id = cartItem['id']|int) }}", method="POST">
-            欲刪減數量:<input class="text-center" type="number" max="{{ cartItem['amount'] }}" id="amount" name="amount" required/>
-        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                <button type="submit" class="btn btn-outline-dark mt-auto">刪減</button>
-        </div>
-        </form>
-        </td>
-        <td><a href="{{ url_for('del_cart', id = cartItem['id']|int) }}">刪除商品</a></td>
+        <td>{{ orderItem['uId'] }}</td>
+        <td>{{ orderItem['pId'] }}</td>
+        <td>{{ orderItem['product'] }}</td>
+        <td>{{ orderItem['amount'] }}</td>
+        <td>{{ orderItem['sumPrice'] }}</td>
+        <td>{{ orderItem['product_state'] }}</td>
+        <td>{{ orderItem['review'] }}</td>
+
     </tr>
     {% endfor %}
     </table>
-    <p>購物車商品種類數量:{{ items_num }}    <a href="{{ url_for('beOrder') }}">送出成為訂單</a></p>
+    <p>訂單種類數量:{{ items_num }}</p>
     <a href="{{ url_for('home') }}">回到首頁</a>
 
     <main class="container-fluid">

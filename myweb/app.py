@@ -187,6 +187,73 @@ def reduce(id):
         flash('商品數量已減少', 'success')
     return redirect(url_for('cartlist'))
 
+@app.route('/be_order')
+def beOrder():
+    cur = mysql.connection.cursor()
+    # cur.execute("SELECT * FROM customer_cart WHERE user_id = %s", (session['user_id'],))
+    # cus_products = cur.fetchone()
+    try:
+        cur.execute("SELECT * FROM customer_cart WHERE user_id = %s", (session['user_id'],))#該使用者的購物車
+        cus_products = cur.fetchall()
+        print(cus_products)
+        if cus_products:
+            cur.execute("SELECT * FROM `order`")
+            order_now = cur.fetchall()
+            if order_now:
+                # tmp = 0
+                k = 0
+                for i in range(len(order_now)):
+                        # oId = k
+                        # print(k)
+                        if k != int(order_now[i]['oId']):
+                            oId = k                            
+                            # print(k)
+                            continue
+                        else:
+                            k += 1
+                            continue
+
+            for i in range(len(cus_products)):
+                oId = k#同筆訂單oId相同
+                uId = session['user_id']
+                pId = int(cus_products[i]['shop_id'])#哪個商家id
+                product = cus_products[i]['product']
+                sumPrice = cus_products[i]['sumPrice']
+                amount = int(cus_products[i]['amount'])
+                product_state = "unChecked"#訂單狀態
+                review = 0#評價?
+
+                cur.execute("INSERT INTO `order` (oId, uId, pId, product, sumPrice, amount, product_state, review) VALUES (%s, %s, %s,%s, %s, %s, %s, %s)", (oId, uId, pId,product, sumPrice, amount,product_state, review))
+                mysql.connection.commit()
+                cur.execute("TRUNCATE TABLE `customer_cart`")
+                mysql.connection.commit()
+
+
+            with mysql.connection.cursor() as cur2:
+                orderItem = cur2.execute('SELECT * FROM `order` WHERE uId=%s', (uId,))
+                if orderItem > 0:
+                    order_products = cur2.fetchall()
+                    items_num = len(order_products)
+                else:
+                    order_products = []
+                    items_num = 0
+
+            # return render_template('order.html', order_products = order_products, items_num = items_num)
+
+    except Exception as e:
+        # Rollback changes in case of an error
+        mysql.connection.rollback()
+        print("exception")
+        # Return a JSON response in case of an error
+        return jsonify({'success': False, 'message': str(e)})
+
+    finally:
+        # Close the cursor
+        cur.close()
+
+    # return jsonify({'success': False, 'message': 'No products found for the user'})
+
+    return render_template('order.html', order_products = order_products, items_num = items_num)
 
 # #商家頁面
 @app.route('/shop')

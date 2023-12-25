@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-11-25 20:05:42
+-- 產生時間： 2023-12-25 14:55:53
 -- 伺服器版本： 10.4.28-MariaDB
 -- PHP 版本： 8.2.4
 
@@ -38,15 +38,6 @@ CREATE TABLE `customer_cart` (
   `shop_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- 傾印資料表的資料 `customer_cart`
---
-
-INSERT INTO `customer_cart` (`id`, `product`, `price`, `amount`, `sumPrice`, `description`, `user_id`, `shop_id`) VALUES
-(27, 'Grape', 20, 3, 60, '葡萄', 1, 0),
-(28, 'Pineapple', 50, 6, 300, '鳳梨辣', 1, 0),
-(29, 'apple', 50, 3, 150, '蘋果', 1, 0);
-
 -- --------------------------------------------------------
 
 --
@@ -55,12 +46,29 @@ INSERT INTO `customer_cart` (`id`, `product`, `price`, `amount`, `sumPrice`, `de
 
 CREATE TABLE `order` (
   `order_id` int(11) NOT NULL,
+  `oId` int(11) NOT NULL,
   `uId` int(11) NOT NULL,
   `pId` int(11) NOT NULL,
+  `product` text NOT NULL,
+  `sumPrice` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   `product_state` varchar(10) NOT NULL,
   `review` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- 傾印資料表的資料 `order`
+--
+
+INSERT INTO `order` (`order_id`, `oId`, `uId`, `pId`, `product`, `sumPrice`, `amount`, `product_state`, `review`) VALUES
+(1, 0, 1, 0, 'Grape', 60, 3, 'unChecked', 0),
+(2, 0, 1, 0, 'Pineapple', 300, 6, 'unChecked', 0),
+(3, 0, 1, 0, 'apple', 50, 1, 'unChecked', 0),
+(4, 0, 1, 0, 'Watermelon', 71, 1, 'unChecked', 0),
+(14, 1, 1, 0, 'Peach', 30, 3, 'unChecked', 0),
+(15, 1, 1, 0, 'Watermelon', 710, 10, 'unChecked', 0),
+(16, 1, 1, 0, 'apple', 100, 2, 'unChecked', 0),
+(17, 2, 1, 0, 'Grape', 55, 5, 'unChecked', 0);
 
 -- --------------------------------------------------------
 
@@ -85,7 +93,7 @@ INSERT INTO `product` (`id`, `name`, `price`, `stock`, `description`, `shop_id`)
 (1, 'banana', 10, 10, '香蕉', 0),
 (2, 'apple', 50, 6, '蘋果', 0),
 (3, 'Watermelon', 71, 12, '西瓜', 0),
-(4, 'Grape', 20, 10, '葡萄', 0),
+(4, 'Grape', 11, 15, '葡萄', 0),
 (5, 'Peach', 10, 6, '桃子', 0),
 (7, 'Pineapple', 50, 10, '鳳梨辣', 0);
 
@@ -167,13 +175,13 @@ ALTER TABLE `users`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `customer_cart`
 --
 ALTER TABLE `customer_cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `order`
 --
 ALTER TABLE `order`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product`
