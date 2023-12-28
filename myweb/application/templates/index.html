@@ -52,6 +52,8 @@
                             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="/shop">可新增商品Shop</a></li>
+                                
+                                <li><a class="dropdown-item" href="/shop_order">訂單瀏覽</a></li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li><a class="dropdown-item" href="#!">Popular Items</a></li>
                                 <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
@@ -128,8 +130,8 @@
                                 </div>
                                 </form>
                             {% else %}
-                                <a class="btn btn-outline-dark mt-auto" href="{{ url_for('change_product', id = product['id']|int) }}">修改</a>
-                                <a class="btn btn-outline-dark mt-auto" href="{{ url_for('delete_product', id = product['id']|int) }}">刪除</a>
+                                <!-- <a class="btn btn-outline-dark mt-auto" href="{{ url_for('change_product', id = product['id']|int) }}">修改</a>
+                                <a class="btn btn-outline-dark mt-auto" href="{{ url_for('delete_product', id = product['id']|int) }}">刪除</a> -->
                             {% endif %}
                                 
 

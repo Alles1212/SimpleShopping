@@ -76,13 +76,14 @@ def login():
             print (type(session['user_id']))
             session['user_name'] = user['name']
             session['user_pos'] = pos[user['pos']]
+            session['pos']=user['pos']
 
             if user['pos'] == 0:# 0:客戶
                 flash('customerUser Login successful.', 'success')            
                 return render_template('browse_client.html', products = products)
             elif user['pos'] == 1:# 1:商家
                 flash('shopUser Login successful.', 'success')
-                return render_template('browse.html', products = products) 
+                return index() 
             else:# 2:物流
                 flash('shipUser Login successful.', 'success')
                 return render_template('index.html') 
@@ -128,6 +129,7 @@ def add_cart(id):
     amount_str = request.form.get('amount')
     amount = int(amount_str)
     item_add = cur.fetchone()
+
     if item_add:
         product = item_add['name']
         price = item_add['price']
@@ -135,22 +137,22 @@ def add_cart(id):
         shop_id = item_add['shop_id']
         user_id = session['user_id']
 
-        if (amount>=item_add['stock']):
+        if amount >= item_add['stock']:
             flash('產品庫存不足', 'danger')
             return redirect(url_for('cartlist'))
         else:
-            amount=amount
-        sumPrice = price * amount
-        
-        cur.execute("INSERT INTO customer_cart (product, price, amount, sumPrice, description, user_id, shop_id) VALUES (%s, %s, %s, %s, %s, %s, %s)",(product, price, amount, sumPrice, description, user_id, shop_id))
-        mysql.connection.commit()
-        cur.close()
-        flash('成功加入購物車', 'success')
-        return redirect(url_for('cartlist'))
+            sumPrice = price * amount
+            cur.execute("INSERT INTO customer_cart (product, price, amount, sumPrice, description, user_id, shop_id) VALUES (%s, %s, %s, %s, %s, %s, %s)",(product, price, amount, sumPrice, description, user_id, shop_id))
+            cur.execute("UPDATE product SET stock=stock-%s WHERE name=%s", (amount, product))
+            mysql.connection.commit()
+            cur.close()
+            flash('成功加入購物車', 'success')
+            return redirect(url_for('cartlist'))
     else:
         cur.close()
         flash('產品不存在', 'danger')
         return redirect(url_for('cartlist'))
+
     
 @app.route('/del_cart/<int:id>')
 def del_cart(id):
@@ -188,7 +190,7 @@ def reduce(id):
     return redirect(url_for('cartlist'))
 
 @app.route('/be_order')
-def beOrder():
+def be_order():
     cur = mysql.connection.cursor()
     # cur.execute("SELECT * FROM customer_cart WHERE user_id = %s", (session['user_id'],))
     # cus_products = cur.fetchone()
@@ -229,6 +231,7 @@ def beOrder():
                 mysql.connection.commit()
 
 
+
             with mysql.connection.cursor() as cur2:
                 orderItem = cur2.execute('SELECT * FROM `order` WHERE uId=%s', (uId,))
                 if orderItem > 0:
@@ -253,24 +256,29 @@ def beOrder():
 
     # return jsonify({'success': False, 'message': 'No products found for the user'})
 
-    return render_template('order.html', order_products = order_products, items_num = items_num)
+    return order()
 
 # #商家頁面
 @app.route('/shop')
 def index():
-    # product data
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT * from product")
+    if session['pos']==1:
+        
+    
+        # product data
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * from product WHERE shop_id = %s", (session['user_id'],))
+    
 
+        # Get column names to use as keys in the dictionaries
+        # columns = [column[0] for column in cur.description]
 
-    # Get column names to use as keys in the dictionaries
-    # columns = [column[0] for column in cur.description]
-
-    # Fetch all rows as a list of dictionaries
-    products = cur.fetchall() #更動
-    # products = [dict(zip(columns, row)) for row in cur.fetchall()]
-    cur.close()
-    return render_template('browse.html', products = products)
+        # Fetch all rows as a list of dictionaries
+        products = cur.fetchall() #更動
+        # products = [dict(zip(columns, row)) for row in cur.fetchall()]
+        cur.close()
+        return render_template('browse.html', products = products)
+    else:
+        return index()
 
 @app.route('/insert', methods=['POST'])
 def insert():
@@ -284,7 +292,7 @@ def insert():
 
         try:
             # Insert data into the database
-            cur.execute("INSERT INTO product (name, price, stock,description) VALUES (%s, %s, %s,%s)", (name, price, stock,description))
+            cur.execute("INSERT INTO product (name, price, stock,description,shop_id) VALUES (%s, %s, %s,%s,%s)", (name, price, stock,description,session['user_id']))
 
             # Commit changes and close the cursor
             mysql.connection.commit()
@@ -358,7 +366,73 @@ def update():
             cur.close()
 
     return index()
+@app.route('/shop_order')
+def shop_order():
+    cur = mysql.connection.cursor()
+    if session['pos']==1:
+        # 使用反引號標記 SQL 保留字
+        shop_order = cur.execute("SELECT * FROM `order` WHERE pId = %s", (session['user_id'],))
+        
+        if shop_order > 0:
+            # 取得結果
+            shop_order_result = cur.fetchall()
+            items_num = len(shop_order_result)
+
+            # 關閉 cursor
+            cur.close()
+
+            # 傳遞結果至模板
+            return render_template('shop_order.html', shop_orders=shop_order_result, items_num=items_num)
+        
+        else:
+            items_num = 0
+            cur.close()
+            return render_template('shop_order.html', shop_orders=[], items_num=items_num)
+    else:
+        return order()
 
 
+@app.route('/order')
+def order():
+    cur = mysql.connection.cursor()
+
+    # 使用反引號標記 SQL 保留字
+    orderItem= cur.execute("SELECT * FROM `order` WHERE uID = %s", (session['user_id'],))
+    
+    if orderItem> 0:
+        # 取得結果
+        orderItem_result = cur.fetchall()
+        items_num = len(orderItem_result)
+        
+        # 關閉 cursor
+        cur.close()
+
+        # 傳遞結果至模板
+        return render_template('order.html', order_products=orderItem_result, items_num=items_num)
+    
+    else:
+        items_num = 0
+        cur.close()
+        return render_template('order.html', order_products=[], items_num=items_num)
+
+
+@app.route('/ok_order/<int:id>')
+def ok_order(id):
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("處理中訂單", id,))
+    mysql.connection.commit()
+    cur.close()
+
+    return shop_order()
+
+@app.route('/deliver_order/<int:id>')
+def deliver_order(id):
+
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("寄送中訂單", id,))
+    mysql.connection.commit()
+    cur.close()
+
+    return shop_order()
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

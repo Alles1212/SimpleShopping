@@ -10,25 +10,29 @@
     <tr>
         <th>訂單序號</th>
         <th>uId</th>
-        <th>pId</th>
+       
+        <th>商家id</th>
         <th>product</th>
         <th>amount</th>
         <th>sumPrice</th>
         <th>product_state</th>
         <th>review</th>
-        
+        <th>確認訂單</th>
+        <th>包裝出貨</th>
     </tr>
-    {% for orderItem in order_products %}
+    {% for shop_order in shop_orders %}
     <tr>
-        <td>{{ orderItem['order_id'] }}</td>
-        <td>{{ orderItem['uId'] }}</td>
-        <td>{{ orderItem['pId'] }}</td>
-        <td>{{ orderItem['product'] }}</td>
-        <td>{{ orderItem['amount'] }}</td>
-        <td>{{ orderItem['sumPrice'] }}</td>
-        <td>{{ orderItem['product_state'] }}</td>
-        <td>{{ orderItem['review'] }}</td>
-
+        <td>{{ shop_order['order_id'] }}</td>
+        <td>{{ shop_order['uId'] }}</td>
+        
+        <td>{{ shop_order['pId'] }}</td>
+        <td>{{ shop_order['product'] }}</td>
+        <td>{{ shop_order['amount'] }}</td>
+        <td>{{ shop_order['sumPrice'] }}</td>
+        <td>{{ shop_order['product_state'] }}</td>
+        <td>{{ shop_order['review'] }}</td>
+        <td><a class="btn btn-outline-dark mt-auto" href="{{ url_for('ok_order', id = shop_order['order_id']|int) }}">確認</a></td>
+       <td> <a class="btn btn-outline-dark mt-auto" href="{{ url_for('deliver_order', id = shop_order['order_id']|int) }}">包裝</a></td>
     </tr>
     {% endfor %}
     </table>
@@ -60,4 +64,3 @@
     </main>
 </body>
 </html>
-
