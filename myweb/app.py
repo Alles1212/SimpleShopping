@@ -460,11 +460,6 @@ def write_review(id):
     # 渲染 HTML 模板并传递订单数据
     return render_template('review.html', orderItem = orderItem)
 
-# app.py
-
-from flask import Flask, render_template, request, redirect, url_for
-
-app = Flask(__name__)
 
 @app.route('/setreview/<int:id>', methods=['POST'])
 def set_review(id):
