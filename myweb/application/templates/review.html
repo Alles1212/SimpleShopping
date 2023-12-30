@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+</head>
+<body>
+<h2>Order Details</h2>
+{% if orderItem %}
+    <table border="2">
+        <tr>
+            <th>訂單序號</th>
+            <th>oId</th>
+            <th>uId</th>
+            <th>pId</th>
+            <th>product</th>
+            <th>sumPrice</th>
+            <th>amount</th>
+            <th>product_state</th>
+            <th>Review</th>
+        </tr>
+        <tr>
+            <td>{{ orderItem['order_id'] }}</td>
+            <td>{{ orderItem['oId'] }}</td>
+            <td>{{ orderItem['uId'] }}</td>
+            <td>{{ orderItem['pId'] }}</td>
+            <td>{{ orderItem['product'] }}</td>
+            <td>{{ orderItem['sumPrice'] }}</td>
+            <td>{{ orderItem['amount'] }}</td>
+            <td>{{ orderItem['product_state'] }}</td>
+            <td>
+                <form id="reviewForm" method="post" action="{{ url_for('set_review', id=orderItem['order_id']|int) }}">
+                    <label for="reviewInput">評分：</label>
+                    <input type="number" name="review" id="reviewInput" placeholder="輸入評分（1-5）" min="1" max="5" required>
+                    <button type="submit">提交評論</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+{% else %}
+    <p>找不到相應的訂單信息。</p>
+{% endif %}
+
+<script>
+    function submitReview() {
+        var reviewInput = document.getElementById('reviewInput').value;
+        alert('評論提交成功：' + reviewInput);
+    }
+</script>
+
+</body>
+</html>

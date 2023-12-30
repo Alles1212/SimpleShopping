@@ -86,7 +86,7 @@ def login():
                 return index() 
             else:# 2:物流
                 flash('shipUser Login successful.', 'success')
-                return render_template('index.html') 
+                return transport()
         else:
             flash('Login failed. Please check your username and password.', 'danger')
 
@@ -429,10 +429,59 @@ def ok_order(id):
 def deliver_order(id):
 
     cur = mysql.connection.cursor()
-    cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("寄送中訂單", id,))
+    cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("delivering", id,))
     mysql.connection.commit()
     cur.close()
 
-    return shop_order()
+    return transport()
+
+#列出所有的訂單
+@app.route('/transport',methods=['POST'])
+def transport():
+    cur = mysql.connection.cursor()
+    # 從資料庫中擷取所有狀態
+    cur.execute("SELECT * FROM `order` ")
+    transports= cur.fetchall()
+    # 关闭数据库连接
+    cur.close()
+    # 渲染 HTML 模板并传递订单数据
+    return render_template('transport.html', transports=transports)
+
+#列出評價
+
+@app.route('/write_review/<int:id>',methods=['POST','GET'])
+def write_review(id):
+    cur = mysql.connection.cursor()
+    # 從資料庫中擷取所有狀態
+    cur.execute("SELECT * FROM `order` WHERE `order_id` = %s", (id,))
+    orderItem= cur.fetchone()
+    # 关闭数据库连接
+    cur.close()
+    # 渲染 HTML 模板并传递订单数据
+    return render_template('review.html', orderItem = orderItem)
+
+# app.py
+
+from flask import Flask, render_template, request, redirect, url_for
+
+app = Flask(__name__)
+
+@app.route('/setreview/<int:id>', methods=['POST'])
+def set_review(id):
+    try:
+        # 从表单中获取评论
+        review = request.form.get('review')
+
+        # 更新数据库中的订单信息
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE `order` SET `review` = %s WHERE `order_id` = %s", (review, id,))
+        cur.close()
+
+        # 重定向到订单页面或其他页面
+        return redirect(url_for('order'))
+    except Exception as e:
+        # 处理错误
+        return jsonify({'success': False, 'message': str(e)})
+
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

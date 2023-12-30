@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Information</title>
+</head>
+<body>
+
+<h2>transport</h2>
+
+<table border="2">
+    <tr>
+        <th>訂單序號</th>
+        <th>oid</th>
+        <th>uId</th>
+        <th>pId</th>
+        <th>product</th>
+        <th>amount</th>
+        <th>sumPrice</th>
+        <th>product_state</th>
+        <th>chang state</th>
+        
+    </tr>
+    {% for orderItem in transports %}
+    <tr>
+        <td>{{ orderItem['order_id'] }}</td>
+        <td>{{ orderItem['oId'] }}</td>
+        <td>{{ orderItem['uId'] }}</td>
+        <td>{{ orderItem['pid'] }}</td>
+        <td>{{ orderItem['product'] }}</td>
+        <td>{{ orderItem['sumPrice'] }}</td>
+        <td>{{ orderItem['amount'] }}</td>
+        <td>{{ orderItem['product_state'] }}</td>
+        <td><a href="{{ url_for('deliver_order', id = orderItem['order_id']|int) }}">改變狀態</a></td></td>
+
+    </tr>
+    {% endfor %}
+</table>
+    <a href="{{ url_for('home') }}">回到首頁</a>
+</body>
+</html>
