@@ -470,6 +470,7 @@ def set_review(id):
         # 更新数据库中的订单信息
         cur = mysql.connection.cursor()
         cur.execute("UPDATE `order` SET `review` = %s WHERE `order_id` = %s", (review, id,))
+        mysql.connection.commit()
         cur.close()
 
         # 重定向到订单页面或其他页面
