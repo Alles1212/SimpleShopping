@@ -32,7 +32,7 @@
         <td>{{ orderItem['sumPrice'] }}</td>
         <td>{{ orderItem['amount'] }}</td>
         <td>{{ orderItem['product_state'] }}</td>
-        <td><a href="{{ url_for('deliver_order', id = orderItem['order_id']|int) }}">改變狀態</a></td></td>
+        <td><a href="{{ url_for('deliver_order', id = orderItem['order_id']|int) }}">change status</a></td></td>
 
     </tr>
     {% endfor %}

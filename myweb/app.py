@@ -434,6 +434,15 @@ def deliver_order(id):
     cur.close()
 
     return transport()
+@app.route('/check_order/<int:id>')
+def check_order(id):
+
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("finished", id,))
+    mysql.connection.commit()
+    cur.close()
+
+    return write_review(id)
 
 #列出所有的訂單
 @app.route('/transport',methods=['POST'])
@@ -469,7 +478,7 @@ def set_review(id):
 
         # 更新数据库中的订单信息
         cur = mysql.connection.cursor()
-        cur.execute("UPDATE `order` SET `review` = %s WHERE `order_id` = %s", (review, id,))
+        cur.execute("UPDATE `order` SET `review` = %s WHERE `order_id` = %s and `product_state`= 'packing' ", (review, id,) )
         mysql.connection.commit()
         cur.close()
 

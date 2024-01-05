@@ -28,6 +28,7 @@
         <td>{{ orderItem['sumPrice'] }}</td>
         <td>{{ orderItem['product_state'] }}</td>
         <td>{{ orderItem['review'] }}</td>
+        <td><a href="{{ url_for('check_order', id = orderItem['order_id']|int) }}">change status</a></td></td>
         <td><a href="{{ url_for('write_review',id= orderItem['order_id']|int ) }}">write review</a></td>
 
     </tr>
