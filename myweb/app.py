@@ -419,7 +419,7 @@ def order():
 @app.route('/ok_order/<int:id>')
 def ok_order(id):
     cur = mysql.connection.cursor()
-    cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("處理中訂單", id,))
+    cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("packing", id,))
     mysql.connection.commit()
     cur.close()
 
@@ -440,7 +440,7 @@ def deliver_order(id):
 def transport():
     cur = mysql.connection.cursor()
     # 從資料庫中擷取所有狀態
-    cur.execute("SELECT * FROM `order` ")
+    cur.execute("SELECT * FROM `order` where  `product_state`= 'packing'")
     transports= cur.fetchall()
     # 关闭数据库连接
     cur.close()
