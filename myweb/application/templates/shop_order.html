@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomerCart</title>
+</head>
+<body>
+    <table border="2">
+    <tr>
+        <th>訂單序號</th>
+        <th>uId</th>
+       
+        <th>商家id</th>
+        <th>product</th>
+        <th>amount</th>
+        <th>sumPrice</th>
+        <th>product_state</th>
+        <th>review</th>
+        <th>確認訂單</th>
+        <th>包裝出貨</th>
+    </tr>
+    {% for shop_order in shop_orders %}
+    <tr>
+        <td>{{ shop_order['order_id'] }}</td>
+        <td>{{ shop_order['uId'] }}</td>
+        
+        <td>{{ shop_order['pId'] }}</td>
+        <td>{{ shop_order['product'] }}</td>
+        <td>{{ shop_order['amount'] }}</td>
+        <td>{{ shop_order['sumPrice'] }}</td>
+        <td>{{ shop_order['product_state'] }}</td>
+        <td>{{ shop_order['review'] }}</td>
+        <td><a class="btn btn-outline-dark mt-auto" href="{{ url_for('ok_order', id = shop_order['order_id']|int) }}">確認</a></td>
+       <td> <a class="btn btn-outline-dark mt-auto" href="{{ url_for('deliver_order', id = shop_order['order_id']|int) }}">包裝</a></td>
+    </tr>
+    {% endfor %}
+    </table>
+    <p>訂單種類數量:{{ items_num }}</p>
+    <a href="{{ url_for('home') }}">回到首頁</a>
+
+    <main class="container-fluid">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                {% with messages = get_flashed_messages(with_categories = true)%}
+                    {% if messages %}
+                        {% for category, message in messages%}
+                            <script>
+                                // 美化訊息框, msg
+                                Swal.fire({//以js綁定
+                                    title: "{{ category.title() }}",
+                                    text: "{{ message }}",
+                                    icon: "{{ category }}",
+                                    closeOnConfirm: false
+                                })
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </main>
+</body>
+</html>

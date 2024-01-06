@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomerCart</title>
+</head>
+<body>
+    <table border="2">
+    <tr>
+        <th>訂單序號</th>
+        <th>uId</th>
+        <th>pId</th>
+        <th>product</th>
+        <th>amount</th>
+        <th>sumPrice</th>
+        <th>product_state</th>
+        <th>review</th>
+        
+    </tr>
+    {% for orderItem in order_products %}
+    <tr>
+        <td>{{ orderItem['order_id'] }}</td>
+        <td>{{ orderItem['uId'] }}</td>
+        <td>{{ orderItem['pId'] }}</td>
+        <td>{{ orderItem['product'] }}</td>
+        <td>{{ orderItem['amount'] }}</td>
+        <td>{{ orderItem['sumPrice'] }}</td>
+        <td>{{ orderItem['product_state'] }}</td>
+        <td>{{ orderItem['review'] }}</td>
+        <td><a href="{{ url_for('write_review',id= orderItem['order_id']|int ) }}">write review</a></td>
+
+    </tr>
+    {% endfor %}
+    </table>
+    <p>訂單種類數量:{{ items_num }}</p>
+    <a href="{{ url_for('home') }}">回到首頁</a>
+
+    <main class="container-fluid">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                {% with messages = get_flashed_messages(with_categories = true)%}
+                    {% if messages %}
+                        {% for category, message in messages%}
+                            <script>
+                                // 美化訊息框, msg
+                                Swal.fire({//以js綁定
+                                    title: "{{ category.title() }}",
+                                    text: "{{ message }}",
+                                    icon: "{{ category }}",
+                                    closeOnConfirm: false
+                                })
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </main>
+</body>
+</html>
+
