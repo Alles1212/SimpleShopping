@@ -69,6 +69,10 @@ def login():
 
         cur.execute("SELECT * FROM product")
         products = cur.fetchall()
+        #選擇所有訂單
+        cur.execute("SELECT * FROM product")
+        transport=cur.fetchall()
+
         pos ={0:'客戶',1:'商家',2:'物流'}
         if user:
             session['user_id'] = user['id']
@@ -183,8 +187,9 @@ def reduce(id):
     if (reduce_amount > result['amount']):
         flash('不能刪減多於原數量', 'danger')
     elif(reduce_amount == result['amount']):
-        cur.execute("UPDATE product SET stock=%s WHERE id=%s", (result['amount'], id))
-        mysql.connection.commit()
+        with mysql.connection.cursor() as cur2:
+            cur2.execute("UPDATE product SET stock=%s WHERE id=%s", (result['amount'], id))
+            mysql.connection.commit()
         cur.execute("DELETE FROM customer_cart WHERE id=%s",(id,))
         mysql.connection.commit()
         cur.close()
