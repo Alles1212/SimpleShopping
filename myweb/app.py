@@ -137,7 +137,7 @@ def add_cart(id):
         shop_id = item_add['shop_id']
         user_id = session['user_id']
 
-        if amount >= item_add['stock']:
+        if amount > item_add['stock']:
             flash('產品庫存不足', 'danger')
             return redirect(url_for('cartlist'))
         else:
@@ -182,6 +182,13 @@ def reduce(id):
     print(reduce_amount)
     if (reduce_amount > result['amount']):
         flash('不能刪減多於原數量', 'danger')
+    elif(reduce_amount == result['amount']):
+        cur.execute("UPDATE product SET stock=%s WHERE id=%s", (result['amount'], id))
+        mysql.connection.commit()
+        cur.execute("DELETE FROM customer_cart WHERE id=%s",(id,))
+        mysql.connection.commit()
+        cur.close()
+        flash('商品已為0刪除', 'success')
     else:
         cur.execute("UPDATE customer_cart SET amount=%s, sumPrice=%s WHERE id=%s ", (result['amount'] - reduce_amount, sumPrice, id))
         mysql.connection.commit()#才會commit
