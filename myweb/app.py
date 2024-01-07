@@ -71,7 +71,7 @@ def login():
         products = cur.fetchall()
         #選擇所有訂單
         cur.execute("SELECT * FROM product")
-        transport=cur.fetchall()
+        #transport=cur.fetchall()
 
         pos ={0:'客戶',1:'商家',2:'物流'}
         if user:
@@ -445,12 +445,37 @@ def deliver_order(id):
 
     return transport()
 
+@app.route('/check_order/<int:id>')
+def check_order(id):
+    cur = mysql.connection.cursor()
+    check = cur.execute("SELECT * FROM `order` WHERE `product_state` = 'delivered' AND `order_id` = %s", (id,))
+
+    if check:
+        cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("finished", id))
+        mysql.connection.commit()
+        cur.close()
+        return write_review(id)
+
+    cur.close()
+    return order()
+
+
+@app.route('/delivertoCus/<int:id>')
+def delivertoCus(id):
+
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE `order` SET `product_state` = %s WHERE `order_id` = %s", ("delivered", id,))
+    mysql.connection.commit()
+    cur.close()
+
+    return transport()
+
 #列出所有的訂單
 @app.route('/transport',methods=['POST'])
 def transport():
     cur = mysql.connection.cursor()
     # 從資料庫中擷取所有狀態
-    cur.execute("SELECT * FROM `order` ")
+    cur.execute("SELECT * FROM `order` where  `product_state`= 'delivering'")
     transports= cur.fetchall()
     # 关闭数据库连接
     cur.close()
@@ -463,12 +488,15 @@ def transport():
 def write_review(id):
     cur = mysql.connection.cursor()
     # 從資料庫中擷取所有狀態
-    cur.execute("SELECT * FROM `order` WHERE `order_id` = %s", (id,))
-    orderItem= cur.fetchone()
+    check = cur.execute("SELECT * FROM `order` WHERE `product_state` = 'finished' AND `order_id` = %s", (id,))
+    if check:
+        cur.execute("SELECT * FROM `order` WHERE `order_id` = %s ", (id,))
+        orderItem= cur.fetchone()
+        return render_template('review.html', orderItem = orderItem)
     # 关闭数据库连接
     cur.close()
     # 渲染 HTML 模板并传递订单数据
-    return render_template('review.html', orderItem = orderItem)
+    return order()
 
 
 @app.route('/setreview/<int:id>', methods=['POST'])
