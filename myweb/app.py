@@ -487,7 +487,7 @@ def transport():
 def write_review(id):
     cur = mysql.connection.cursor()
     # 從資料庫中擷取所有狀態
-    check = cur.execute("SELECT * FROM `order` WHERE `product_state` = 'delivered' AND `order_id` = %s", (id,))
+    check = cur.execute("SELECT * FROM `order` WHERE `product_state` = 'finished' AND `order_id` = %s", (id,))
     if check:
         cur.execute("SELECT * FROM `order` WHERE `order_id` = %s ", (id,))
         orderItem= cur.fetchone()
