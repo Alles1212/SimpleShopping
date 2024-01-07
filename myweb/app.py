@@ -72,6 +72,7 @@ def login():
         #選擇所有訂單
         cur.execute("SELECT * FROM product")
         #transport=cur.fetchall()
+        #transport=cur.fetchall()
 
         pos ={0:'客戶',1:'商家',2:'物流'}
         if user:
@@ -493,9 +494,15 @@ def write_review(id):
         cur.execute("SELECT * FROM `order` WHERE `order_id` = %s ", (id,))
         orderItem= cur.fetchone()
         return render_template('review.html', orderItem = orderItem)
+    check = cur.execute("SELECT * FROM `order` WHERE `product_state` = 'finished' AND `order_id` = %s", (id,))
+    if check:
+        cur.execute("SELECT * FROM `order` WHERE `order_id` = %s ", (id,))
+        orderItem= cur.fetchone()
+        return render_template('review.html', orderItem = orderItem)
     # 关闭数据库连接
     cur.close()
     # 渲染 HTML 模板并传递订单数据
+    return order()
     return order()
 
 
