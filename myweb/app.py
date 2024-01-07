@@ -171,34 +171,32 @@ def del_cart(id):
 def reduce(id):
     cur = mysql.connection.cursor()
     reduce_amount = request.form.get('amount')
-    cur.execute("SELECT amount,price FROM customer_cart WHERE id = %s", (id,))
+    cur.execute("SELECT amount,price ,product FROM customer_cart WHERE id = %s", (id,))
     result = cur.fetchone()
     print(result)
     print(result['amount'])
     print(result['price'])
-    # print(result['price'])
-    # print(result['sumPrice'])
-    # if result:
-    #     origin = result[3]
-    # print(origin)
+
     reduce_amount = int(reduce_amount)
     sumPrice = result['price'] * (result['amount'] - reduce_amount)
     print(reduce_amount)
     if (reduce_amount > result['amount']):
         flash('不能刪減多於原數量', 'danger')
-    elif(reduce_amount == result['amount']):
-        with mysql.connection.cursor() as cur2:
-            cur2.execute("UPDATE product SET stock=%s WHERE id=%s", (result['amount'], id))
-            mysql.connection.commit()
-        cur.execute("DELETE FROM customer_cart WHERE id=%s",(id,))
+    elif reduce_amount == result['amount']:
+        cur.execute("UPDATE product SET stock = %s + stock WHERE name = %s", (reduce_amount,result['product']))
+        mysql.connection.commit()
+        cur.execute("DELETE FROM customer_cart WHERE id = %s", (id,))
         mysql.connection.commit()
         cur.close()
         flash('商品已為0刪除', 'success')
     else:
-        cur.execute("UPDATE customer_cart SET amount=%s, sumPrice=%s WHERE id=%s ", (result['amount'] - reduce_amount, sumPrice, id))
-        mysql.connection.commit()#才會commit
+        cur.execute("UPDATE product SET stock = %s + stock WHERE name = %s", (reduce_amount, result['product']))
+        cur.execute("UPDATE customer_cart SET amount = %s, sumPrice = %s WHERE id = %s", (result['amount'] - reduce_amount, sumPrice, id))
+        mysql.connection.commit()
         cur.close()
         flash('商品數量已減少', 'success')
+
+
     return redirect(url_for('cartlist'))
 
 @app.route('/be_order')
