@@ -10,6 +10,7 @@
 <h2>transport</h2>
 
 <table border="2">
+    <h3>需要運輸</h3>
     <tr>
         <th>訂單序號</th>
         <th>oid</th>
@@ -32,11 +33,12 @@
         <td>{{ orderItem['sumPrice'] }}</td>
         <td>{{ orderItem['amount'] }}</td>
         <td>{{ orderItem['product_state'] }}</td>
-        <td><a href="{{ url_for('deliver_order', id = orderItem['order_id']|int) }}">改變狀態</a></td></td>
+        <td><a href="{{ url_for('delivertoCus', id = orderItem['order_id']|int) }}">改變狀態</a></td></td>
 
     </tr>
     {% endfor %}
 </table>
+
     <a href="{{ url_for('home') }}">回到首頁</a>
 </body>
 </html>
