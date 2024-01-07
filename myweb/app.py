@@ -71,7 +71,7 @@ def login():
         products = cur.fetchall()
         #選擇所有訂單
         cur.execute("SELECT * FROM product")
-        transport=cur.fetchall()
+        #transport=cur.fetchall()
 
         pos ={0:'客戶',1:'商家',2:'物流'}
         if user:
